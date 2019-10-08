@@ -5,7 +5,7 @@ import subprocess
 import shutil
 import time
 
-wildcard = "Thermo raw file (*.raw;*.RAW)|*.raw;*.RAW|" \
+wildcard = "MSn file (*.ms1;*.ms2)|*.ms1;*.ms2|" \
            "All files (*.*)|*.*"
 tic_mode = 2
 pos_neg = 'negative'
@@ -33,9 +33,9 @@ class MyPanel(wx.Panel):
         self.list_ctrl2.InsertColumn(0, 'Group2')
         self.list_ctrl2.SetColumnWidth(0, 300)
 
-        btn = wx.Button(self, label="Open raw files")
+        btn = wx.Button(self, label="Open MSn files")
         btn.Bind(wx.EVT_BUTTON, self.onOpenDirectory)
-        btn2 = wx.Button(self, label="Open raw files")
+        btn2 = wx.Button(self, label="Open MSn files")
         btn2.Bind(wx.EVT_BUTTON, self.onOpenDirectory2)
         btn3 = wx.Button(self, label="Add to queue")
         btn3.Bind(wx.EVT_BUTTON, self.Add_Queue)
@@ -111,7 +111,7 @@ class MyPanel(wx.Panel):
             self, message="Choose a file",
             defaultFile="",
             wildcard=wildcard,
-            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
+            style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
         )
         self.list_ctrl.DeleteAllItems()
         if dlg.ShowModal() == wx.ID_OK:
@@ -130,13 +130,13 @@ class MyPanel(wx.Panel):
             self, message="Choose a file",
             defaultFile="",
             wildcard=wildcard,
-            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
+            style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
         )
         self.list_ctrl2.DeleteAllItems()
         if dlg.ShowModal() == wx.ID_OK:
             paths = dlg.GetPaths()
             for index, path in enumerate(paths):
-                if path[-4:]=='.raw' or path[-4:]=='.RAW':
+                if path[-4:]=='.ms1' or path[-4:]=='.ms2':
                     self.list_ctrl2.InsertStringItem(index, path)
         dlg.Destroy()
 
@@ -152,10 +152,10 @@ class MyPanel(wx.Panel):
         count2 = self.list_ctrl2.GetItemCount()
         filenames = []
         for row in range(count):
-            item = self.list_ctrl.GetItem(itemId=row, col=0)
+            item = self.list_ctrl.GetItem(row, col=0)
             filenames.append(item.GetText())
         for row in range(count2):
-            item = self.list_ctrl2.GetItem(itemId=row, col=0)
+            item = self.list_ctrl2.GetItem(row, col=0)
             filenames.append(item.GetText())
         filenames2 = []
 
@@ -164,11 +164,8 @@ class MyPanel(wx.Panel):
             os.makedirs(dilu_analysis_dir)
 
         for each_name in filenames:
-            new_each_name = each_name[:-4] + '.ms1'
-            new_each_name2 = each_name[:-4] + '.ms2'
-            print(new_each_name,dilu_analysis_dir)
-            shutil.move(new_each_name, dilu_analysis_dir)
-            shutil.move(new_each_name2, dilu_analysis_dir)
+            print(each_name,dilu_analysis_dir)
+            shutil.move(each_name, dilu_analysis_dir)
             new_each_name = dilu_analysis_dir+'\\'+os.path.basename(each_name)[:-4]+'.ms1'
             new_each_name2 = dilu_analysis_dir+'\\'+os.path.basename(each_name)[:-4]+'.ms2'
             filenames2.append(new_each_name)
